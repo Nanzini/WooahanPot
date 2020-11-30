@@ -14,20 +14,18 @@ int music[] = {3136,3136,2637,2093,2093,3136,3136,2793,2793,2349,2349,2349,2349,
 
 void setup() {
   Serial.begin(9600);
+
   pinMode(SW_POT, INPUT_PULLUP);
-  play_music();
 }
  
 void loop() {
   // 분갈이 스위치 눌렀을 때
-  if(digitalRead(SW_POT) == LOW)
-    Serial.println(rtc.getDate());
-    Serial.println(rtc.getYear());
-    Serial.print();
-    //Serial.print(rtc.getMonth(),DEC);
-    //Serial.print(rtc.getDay(),DEC);
-   else
-    Serial.print("그만해줘")
+  if(digitalRead(SW_POT) == LOW){
+
+  }
+
+  // 물 주고나서 스위치 누르면 play_module넣으세요
+   
    
 }
 
