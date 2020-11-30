@@ -4,7 +4,8 @@
 #include <LiquidCrystal_I2C.h>
 #include <DS1302.h>
 
-int sw1 = 8; // 분갈이 스위치 8 번
+// 분갈이 모듈 변수
+int  SW_POT = 8; // 분갈이 스위치 8 번
 DS1302 rtc (5, 6, 7); // DS1302
 LiquidCrystal_I2C lcd (0x27,16,2);
 
@@ -22,22 +23,23 @@ int music[] = {3136,3136,2637,2093,2093,3136,3136,2793,2793,2349,2349,2349,2349,
 
 void setup() {
   Serial.begin(9600);
-  // 새로운 날짜와 시간 정보를 칩에 저장
-  // rtc.writeProtect (false);
-  //rtc.halt(false);
-  // 시간 t (2020, 11, 28, 22, 30, 00, 시간 :: kSaturday);
-  //rtc.time(t);
+
+  //  새로운 날짜와 시간 정보를 칩에 저장
+  rtc.writeProtect (false);
+  rtc.halt(false);
+  Time t(2020, 11, 28, 22, 30, 00, Time :: kSaturday);
+  rtc.time(t);
 
   lcd.begin (16, 2);
-  pinMode (sw1, INPUT_PULLUP);
+  pinMode (SW_POT, INPUT_PULLUP);
   play_music();
 }
  
 void loop() {
-  if (digitalRead (sw1) == LOW) {
-printTime ();
-lcd.backlight ();
-}
+  if (digitalRead (SW_POT) == LOW) {
+    printTime ();
+    lcd.backlight ();
+  }
    
 }
 
@@ -52,10 +54,10 @@ void play_music(){
 }
 
 void printTime () {
-Time t = rtc.time (); // 저장된 시간 읽어 오기
-// 날짜 출력
-char repot [12];
-snprintf (repot, sizeof (repot), "%04d-%02d-%02d", t.yr, t.mon, t.date);
-lcd.setCursor (0, 0);
-lcd.print (repot);
+  Time t = rtc.time (); // 저장된 시간 읽어 오기
+  // 날짜 출력
+  char repot [12];
+  snprintf (repot, sizeof (repot), "%04d-%02d-%02d", t.yr, t.mon, t.date);
+  lcd.setCursor (0, 0);
+  lcd.print (repot);
 }
