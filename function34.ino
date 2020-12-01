@@ -3,6 +3,15 @@
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
 #include <DS1302.h>
+#include <dht.h>  
+dht DHT;
+#define DHT11_PIN 13 
+
+
+int waterSwitch = 12;
+int redPin = 11;
+int greenPin = 10;
+int bluePin = 9;
 
 // 분갈이 모듈 변수
 int  SW_POT = 8; // 분갈이 스위치 8 번
@@ -23,7 +32,13 @@ int music[] = {3136,3136,2637,2093,2093,3136,3136,2793,2793,2349,2349,2349,2349,
 
 void setup() {
   Serial.begin(9600);
-
+  lcd.init(); 
+  lcd.clear();   
+  lcd.backlight();
+  pinMode(redPin, OUTPUT);
+  pinMode(greenPin, OUTPUT);
+  pinMode(bluePin, OUTPUT); 
+  pinMode(waterSwitch, INPUT_PULLUP);
   //  새로운 날짜와 시간 정보를 칩에 저장
   rtc.writeProtect (false);
   rtc.halt(false);
@@ -34,8 +49,37 @@ void setup() {
   pinMode (SW_POT, INPUT_PULLUP);
   play_music();
 }
+
  
 void loop() {
+   lcd.clear();
+   lcd.setCursor(0,0);
+  //**************온습도****************//
+    int chk = DHT.read11(DHT11_PIN);  
+  lcd.setCursor(0,0);
+  lcd.print("Temp."); // "온도=" 라고 출력한다.
+  lcd.setCursor(5,0);
+  lcd.print(DHT.temperature); // 온도를 알려준다.
+   lcd.setCursor(8,0);
+ lcd.print("Humi."); // "습도=" 라고 출력한다
+    lcd.setCursor(13,0);
+  lcd.print(DHT.humidity); // 습도를 알려준다.
+
+  //**************전체 점수****************//
+
+   setColor(0, 0, 255);  // blue로 set
+    while(DHT.humidity<50||DHT.temperature>27||DHT.temperature<17){ //온도나 습도 안맞으면
+      for(int i = 0;i<255;i++)
+      {   
+        setColor(0, i, 255-i); //blue에서 green으로 변화
+        }
+      }
+    while(DHT.humidity<35||DHT.temperature>30||DHT.temperature<13){  //온도나 습도 과도하게 안맞으면
+      for(int i= 0;i<255;i++){
+          setColor(i, 255-i,0 );//green에서 red로 변화
+        }
+      }
+  
   if (digitalRead (SW_POT) == LOW) {
     printTime ();
     lcd.backlight ();
@@ -60,4 +104,10 @@ void printTime () {
   snprintf (repot, sizeof (repot), "%04d-%02d-%02d", t.yr, t.mon, t.date);
   lcd.setCursor (0, 0);
   lcd.print (repot);
+}
+void setColor(int red, int green, int blue)
+{
+  analogWrite(redPin, red);
+  analogWrite(greenPin, green);
+  analogWrite(bluePin, blue); 
 }
